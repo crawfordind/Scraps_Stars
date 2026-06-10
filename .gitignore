@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+*.db
+*.db-journal
+drizzle/*.db
+tsconfig.tsbuildinfo
+.claude/
+public/debug-storage/*
+!public/debug-storage/.gitkeep

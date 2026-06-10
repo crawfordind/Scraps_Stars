@@ -1,0 +1,809 @@
+/**
+ * pillars-2026.css — tactile, spatial UI layer for Barefeast.
+ *
+ * Design system extensions (2026 aesthetic):
+ *  • Z-index scale: ambient(0) → glass(1) → content(2) → dock(50) → reward(100)
+ *  • Colored ambient shadows (--glow-*) replace flat box-shadows
+ *  • backdrop-filter glass panels over parchment gradient
+ *  • Spring transitions delegated to Framer Motion; CSS handles static depth
+ *  • Active-cook inverse palette: max legibility at arm's length in kitchen
+ */
+
+:root {
+  /* Colored ambient shadows — physical depth without flat Material cards */
+  --glow-accent: 0 8px 32px rgba(214, 90, 46, 0.28), 0 2px 8px rgba(214, 90, 46, 0.12);
+  --glow-gold: 0 8px 32px rgba(232, 163, 61, 0.32), 0 2px 8px rgba(232, 163, 61, 0.18);
+  --glow-ember: 0 8px 28px rgba(214, 90, 46, 0.26), 0 2px 8px rgba(214, 90, 46, 0.1);
+  --shadow-cta-hover: 0 12px 40px rgba(214, 90, 46, 0.35), 0 4px 12px rgba(232, 163, 61, 0.15);
+  --glass-bg: rgba(250, 247, 242, 0.72);
+  --glass-border: rgba(212, 201, 184, 0.55);
+  --z-content: 2;
+  --z-dock: 50;
+  --z-overlay: 100;
+  --z-drawer: 200;
+  --z-reward: 300;
+  /* Active cook: inverted high-contrast stage */
+  --active-bg: #1a1814;
+  --active-surface: #2c2419;
+  --active-text: #faf7f2;
+  --active-muted: #c4b8a8;
+  --active-accent: #e8a33d;
+  --active-gold: #d65a2e;
+}
+
+/* ── Cook experience shell ─────────────────────────────────────── */
+
+.cook-page__hero {
+  margin-bottom: 1rem;
+}
+
+.cook-experience {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: calc(0.5rem + var(--safe-bottom));
+}
+
+.cook-experience__back {
+  align-self: flex-start;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.cook-experience__back:hover {
+  background: rgba(42, 38, 34, 0.04);
+  box-shadow: var(--shadow-paper);
+}
+
+.cook-experience__back:active {
+  transform: scale(0.97);
+}
+
+/* ── Pillar 1: Gamified Hub ────────────────────────────────────── */
+
+.gamified-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Progression hero — layered depth stack */
+.hub-hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.hub-hero__orb {
+  position: absolute;
+  inset: -12% -8%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    rgba(154, 123, 79, 0.22) 0%,
+    rgba(61, 92, 71, 0.12) 45%,
+    transparent 70%
+  );
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.hub-hero__glass {
+  position: relative;
+  z-index: 1;
+  padding: 1.35rem;
+  border-radius: calc(var(--radius-lg) + 4px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glow-gold), inset 0 1px 0 rgba(255, 253, 249, 0.6);
+}
+
+.hub-hero__top {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.15rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.hub-hero__ring-wrap {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  flex-shrink: 0;
+}
+
+.hub-hero__ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.hub-hero__ring-track {
+  fill: none;
+  stroke: var(--chip-bg);
+  stroke-width: 5;
+}
+
+.hub-hero__ring-fill {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(196, 165, 116, 0.5));
+}
+
+.hub-hero__ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hub-hero__level {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-deep);
+  line-height: 1;
+}
+
+.hub-hero__level-label {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.hub-hero__eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.hub-hero__name {
+  margin: 0 0 0.2rem;
+  font-size: clamp(1.25rem, 4vw, 1.65rem);
+  line-height: 1.15;
+}
+
+.hub-hero__rank {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-deep);
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.hub-hero__xp-total {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.hub-hero__streak {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(154, 123, 79, 0.1);
+  border: 1px solid rgba(154, 123, 79, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 253, 249, 0.4);
+}
+
+.hub-hero__streak strong {
+  display: block;
+  font-size: 0.95rem;
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.hub-hero__streak small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.hub-hero__streak-flame {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Primary CTA — dominant spatial element */
+.hub-primary-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.9rem 1.25rem;
+  border: 1px solid var(--ember);
+  border-radius: var(--radius-pill);
+  background: var(--ember);
+  color: var(--on-accent);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: var(--glow-accent);
+  overflow: hidden;
+}
+
+.hub-primary-cta__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.hub-primary-cta__label {
+  position: relative;
+  z-index: 1;
+}
+
+.hub-primary-cta__arrow {
+  position: relative;
+  z-index: 1;
+  font-size: 1.35rem;
+}
+
+.hub-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.hub-cards-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* Dynamic content cards — lift on hover via Framer, static depth via CSS */
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-paper), var(--card-glow, var(--glow-accent));
+  overflow: hidden;
+}
+
+.hub-card__ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(145deg, transparent 40%, rgba(250, 247, 242, 0.5) 100%);
+  pointer-events: none;
+}
+
+.hub-card__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+}
+
+.hub-card__icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  align-self: start;
+}
+
+.hub-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.hub-card__header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.hub-card__body p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.hub-card__xp {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent-14);
+  color: var(--accent-deep);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.hub-card__cta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hub-card--recipe {
+  border-left: 3px solid var(--accent);
+}
+
+.hub-card--challenge {
+  border-left: 3px solid var(--gold);
+}
+
+.hub-card--tip {
+  border-left: 3px solid var(--accent-secondary);
+}
+
+.hub-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.hub-stat-pill {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-paper);
+}
+
+.hub-stat-pill--highlight {
+  border-color: var(--gold);
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--glow-gold);
+}
+
+.hub-stat-pill__value {
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-deep);
+}
+
+.hub-stat-pill__label {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+/* ── Pillar 2: Active Cooking View ─────────────────────────────── */
+
+.active-cook {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: min(85dvh, 640px);
+  padding: 1.25rem;
+  border-radius: calc(var(--radius-lg) + 6px);
+  background: var(--active-bg);
+  color: var(--active-text);
+  box-shadow:
+    0 0 0 1px rgba(250, 247, 242, 0.06),
+    0 24px 64px rgba(26, 24, 20, 0.45),
+    inset 0 1px 0 rgba(250, 247, 242, 0.04);
+  overflow: hidden;
+}
+
+.active-cook__header {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+.active-cook__recipe {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--active-gold);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.active-cook__progress {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: var(--active-muted);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.active-cook__stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0 2rem;
+}
+
+.active-cook__step {
+  text-align: center;
+}
+
+/* Macro typography — kitchen distance legibility */
+.active-cook__headline {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 8vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--active-text);
+  text-wrap: balance;
+}
+
+.active-cook__detail {
+  margin: 1.25rem auto 0;
+  max-width: 28rem;
+  font-size: clamp(1rem, 3.5vw, 1.15rem);
+  line-height: 1.55;
+  color: var(--active-muted);
+}
+
+.active-cook__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 2rem;
+}
+
+.active-cook__dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: rgba(250, 247, 242, 0.2);
+  transition: transform 0.25s, background 0.25s;
+}
+
+.active-cook__dot--current {
+  background: var(--active-accent);
+  transform: scale(1.35);
+  box-shadow: 0 0 12px rgba(124, 184, 146, 0.5);
+}
+
+.active-cook__dot--done {
+  background: rgba(124, 184, 146, 0.45);
+}
+
+/* Action rail — 64px min touch targets */
+.active-cook__rail {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.65rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.active-cook:has(.timer-dock__chip) .active-cook__rail {
+  padding-bottom: 6.5rem;
+}
+
+.active-cook__nav-btn {
+  min-height: 3.25rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  border-radius: var(--radius-pill);
+  background: var(--active-surface);
+  color: var(--active-muted);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.active-cook__nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.active-cook__timer-btn {
+  grid-column: 1 / -1;
+  min-height: 3.5rem;
+  border: 1.5px dashed rgba(232, 163, 61, 0.55);
+  border-radius: var(--radius-pill);
+  background: rgba(232, 163, 61, 0.1);
+  color: var(--active-gold);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.active-cook__complete-btn {
+  grid-column: 1 / -1;
+  min-height: 4rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--ember) 0%, var(--ember-deep) 100%);
+  color: var(--on-accent);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 4vw, 1.25rem);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 8px 28px rgba(214, 90, 46, 0.35);
+}
+
+/* Floating timer dock — async, z-50 */
+.timer-dock {
+  position: fixed;
+  bottom: calc(1.25rem + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-dock);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(100% - 2rem, 420px);
+  pointer-events: none;
+}
+
+.active-cook .timer-dock {
+  position: absolute;
+  bottom: calc(0.75rem + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 2rem), 420px);
+}
+
+.timer-dock__chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-pill);
+  background: rgba(44, 36, 25, 0.88);
+  backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid rgba(250, 247, 242, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(214, 90, 46, 0.18);
+  pointer-events: auto;
+}
+
+.timer-dock__chip--running {
+  border-color: rgba(124, 184, 146, 0.4);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(124, 184, 146, 0.2);
+}
+
+.timer-dock__chip--complete {
+  border-color: rgba(232, 200, 130, 0.5);
+  background: rgba(61, 92, 71, 0.92);
+}
+
+.timer-dock__label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--active-muted);
+  font-family: var(--font-ui), system-ui, sans-serif;
+}
+
+.timer-dock__time {
+  display: block;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: clamp(2rem, 10vw, 3rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--active-text);
+  line-height: 1;
+}
+
+.timer-dock__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.timer-dock__btn {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  border-radius: var(--radius-pill);
+  background: var(--active-surface);
+  color: var(--active-text);
+  font-size: 1.15rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.timer-dock__btn--dismiss {
+  font-size: 0.95rem;
+}
+
+/* ── Pillar 3: Reward Burst ────────────────────────────────────── */
+
+.reward-burst {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-reward);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.reward-burst__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 24, 20, 0.55);
+}
+
+.reward-burst__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 22rem);
+  padding: 2rem 1.5rem 1.5rem;
+  text-align: center;
+  border-radius: calc(var(--radius-lg) + 8px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glow-gold);
+  overflow: hidden;
+}
+
+.reward-burst--accent .reward-burst__card {
+  box-shadow: var(--glow-accent);
+}
+
+.reward-burst--ember .reward-burst__card {
+  box-shadow: var(--glow-ember);
+}
+
+.reward-burst__particles {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.reward-burst__particle {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--gold-light);
+  box-shadow: 0 0 8px var(--gold-light);
+}
+
+.reward-burst--accent .reward-burst__particle {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.reward-burst__icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--gold-light), var(--gold));
+  font-size: 1.75rem;
+  box-shadow: var(--glow-gold);
+}
+
+.reward-burst__title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.65rem;
+  color: var(--accent-deep);
+}
+
+.reward-burst__subtitle {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.reward-burst__xp {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.reward-burst__dismiss {
+  width: 100%;
+  min-height: 3rem;
+  border: 1px solid var(--ember);
+  border-radius: var(--radius-pill);
+  background: var(--ember);
+  color: var(--on-accent);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ── Responsive & accessibility ────────────────────────────────── */
+
+@media (max-width: 420px) {
+  .hub-hero__top {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .active-cook__rail {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .active-cook__nav-btn:first-child {
+    grid-column: 1;
+  }
+
+  .active-cook__nav-btn:last-child {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-card,
+  .hub-primary-cta,
+  .cook-experience__back,
+  .active-cook__dot {
+    transition: none;
+  }
+}
