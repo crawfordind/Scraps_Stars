@@ -2771,6 +2771,10 @@ main {
   height: 40px;
   object-fit: cover;
   border-radius: 8px;
+  /* Framed on a light ground so a dark/low-key plate photo reads as a
+     thumbnail rather than a broken black square. */
+  border: 1px solid var(--border);
+  background: var(--oat);
 }
 
 .challenge-leaderboard__body {
@@ -2805,6 +2809,9 @@ main {
   height: 56px;
   object-fit: cover;
   border-radius: 8px;
+  /* Framed so a dark plate photo reads as a thumbnail, not a void. */
+  border: 1px solid var(--border);
+  background: var(--oat);
 }
 
 .challenge-page__proof {

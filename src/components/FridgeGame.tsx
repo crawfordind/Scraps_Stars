@@ -250,33 +250,103 @@ export function FridgeGame({ onOpenKitchen, onCoachUpdated, activeChallengeId }:
 
     setGenerating(true);
     setPhase("create");
+    setRecipe(null);
+
+    const requestBody = {
+      inventoryList: ingredients.map((i) => i.ingredientName),
+      preferences: recommendations?.excludeIngredients ?? [],
+      tier,
+      chefId: selectedChefId,
+      flavorHints: recommendations?.flavorHints ?? [],
+    };
+
+    const finalizeRecipe = (data: RecipeOutput, meta: LlmRequestMeta | null) => {
+      setRecipe(data);
+      setRecipeMeta(meta);
+      setChefSpeech(data.chef_commentary ?? "From that? Yeah. From that.");
+      setPhase("verdict");
+    };
+
+    // Blocking fallback used when the stream can't be established or ends early.
+    const generateBlocking = async () => {
+      const res = await fetch("/api/recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Recipe generation failed");
+      finalizeRecipe(json.data as RecipeOutput, json.meta);
+    };
 
     try {
       const res = await fetch("/api/recipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inventoryList: ingredients.map((i) => i.ingredientName),
-          preferences: recommendations?.excludeIngredients ?? [],
-          tier,
-          chefId: selectedChefId,
-          flavorHints: recommendations?.flavorHints ?? [],
-        }),
+        body: JSON.stringify({ ...requestBody, stream: true }),
       });
-      const json = await res.json();
-      if (!json.ok) throw new Error(json.error ?? "Recipe generation failed");
 
-      const data = json.data as RecipeOutput;
-      setRecipe(data);
-      setRecipeMeta(json.meta);
-      setChefSpeech(data.chef_commentary ?? "From that? Yeah. From that.");
-      setPhase("verdict");
-    } catch (err) {
-      showToast({
-        message: err instanceof Error ? err.message : "Recipe generation failed",
-        tone: "error",
-      });
-      setPhase("strategy");
+      if (!res.ok || !res.body) {
+        await generateBlocking();
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let completed = false;
+      let streamError: string | null = null;
+
+      // Parse the SSE frames as they arrive, revealing the recipe progressively.
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() ?? "";
+        for (const frame of frames) {
+          const dataLine = frame.split("\n").find((l) => l.startsWith("data:"));
+          if (!dataLine) continue;
+          let event: { type: string; data?: RecipeOutput; meta?: LlmRequestMeta; error?: string };
+          try {
+            event = JSON.parse(dataLine.slice(5).trim());
+          } catch {
+            continue;
+          }
+
+          if (event.type === "partial" && event.data) {
+            setRecipe(event.data);
+          } else if (event.type === "complete" && event.data) {
+            finalizeRecipe(event.data, event.meta ?? null);
+            completed = true;
+          } else if (event.type === "error") {
+            streamError = event.error ?? "Recipe generation failed";
+          }
+        }
+      }
+
+      if (streamError) throw new Error(streamError);
+      // Stream ended without a complete event — recover via the blocking path.
+      if (!completed) await generateBlocking();
+    } catch (streamErr) {
+      // Last-resort fallback: one blocking attempt before surfacing an error.
+      try {
+        await generateBlocking();
+      } catch (err) {
+        showToast({
+          message:
+            err instanceof Error
+              ? err.message
+              : streamErr instanceof Error
+                ? streamErr.message
+                : "Recipe generation failed",
+          tone: "error",
+        });
+        setRecipe(null);
+        setPhase("strategy");
+      }
     } finally {
       setGenerating(false);
     }

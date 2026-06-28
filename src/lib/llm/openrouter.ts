@@ -20,6 +20,7 @@ import {
   parseModelJson,
 } from "./normalize";
 import { getModelRouting, TASK_MAX_TOKENS } from "./modelRouting";
+import { parsePartialJson } from "./partialJson";
 import {
   TASK_RESPONSE_SCHEMA,
   structuredOutputsEnabled,
@@ -351,13 +352,32 @@ async function invokeOpenRouterJson<T>(args: {
   throw new ModelJsonParseError();
 }
 
-export async function generateRecipe(input: {
+export type RecipeGenerationInput = {
   inventoryList: string[];
   preferences: string[];
   tier: Tier;
   chefId?: string;
   flavorHints?: string[];
-}): Promise<LlmResult<RecipeOutput>> {
+};
+
+/** Render-safe shape for a recipe that is still streaming (display only). */
+export type PartialRecipe = {
+  recipe_name: string;
+  flavor_profile_explanation: string;
+  estimated_time_minutes: number;
+  difficulty: string;
+  ingredients_pantry: string[];
+  ingredients_shopping_list: string[];
+  steps: string[];
+  xp_reward: number;
+  chef_commentary: string;
+  chef_waste_tip: string;
+};
+
+function buildRecipePrompts(input: RecipeGenerationInput): {
+  systemPrompt: string;
+  userPrompt: string;
+} {
   const chef = getChefById(input.chefId ?? "bottura");
   const personaLine = chef?.promptFragment ?? "You are a zero-waste chef.";
   const hintsLine =
@@ -370,6 +390,14 @@ export async function generateRecipe(input: {
 
   const userPrompt = `TIER:${input.tier} EXCLUDE:${JSON.stringify(input.preferences)} PANTRY:${JSON.stringify(input.inventoryList)}`;
 
+  return { systemPrompt, userPrompt };
+}
+
+export async function generateRecipe(
+  input: RecipeGenerationInput,
+): Promise<LlmResult<RecipeOutput>> {
+  const { systemPrompt, userPrompt } = buildRecipePrompts(input);
+
   return invokeOpenRouterJson({
     task: "recipe_generate",
     systemPrompt,
@@ -377,6 +405,144 @@ export async function generateRecipe(input: {
     temperature: 0.2,
     parse: (json) => recipeSchema.parse(normalizeRecipeJson(json)),
   });
+}
+
+/** Display-only coercion of a partially-streamed recipe to a render-safe shape. */
+function normalizePartialRecipe(json: unknown): PartialRecipe {
+  const o = (json && typeof json === "object" ? json : {}) as Record<string, unknown>;
+  const strArray = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+  const str = (v: unknown): string => (typeof v === "string" ? v : "");
+  const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+
+  return {
+    recipe_name: str(o.recipe_name),
+    flavor_profile_explanation: str(o.flavor_profile_explanation),
+    estimated_time_minutes: num(o.estimated_time_minutes),
+    difficulty: str(o.difficulty),
+    ingredients_pantry: strArray(o.ingredients_pantry),
+    ingredients_shopping_list: strArray(o.ingredients_shopping_list),
+    steps: strArray(o.steps),
+    xp_reward: num(o.xp_reward),
+    chef_commentary: str(o.chef_commentary),
+    chef_waste_tip: str(o.chef_waste_tip),
+  };
+}
+
+/**
+ * Streaming variant of {@link generateRecipe}. Calls `onPartial` with render-safe
+ * snapshots as the model emits tokens, then resolves with the fully validated
+ * recipe (same schema as the non-streaming path). Throws on transport/parse
+ * failure so callers can fall back to {@link generateRecipe}.
+ */
+export async function streamRecipe(
+  input: RecipeGenerationInput,
+  handlers: { onPartial?: (partial: PartialRecipe) => void } = {},
+): Promise<LlmResult<RecipeOutput>> {
+  const { primary } = getModelRouting("recipe_generate");
+  const { systemPrompt, userPrompt } = buildRecipePrompts(input);
+  const start = Date.now();
+
+  const response = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({
+      model: primary,
+      stream: true,
+      temperature: 0.2,
+      max_tokens: TASK_MAX_TOKENS.recipe_generate,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!response.ok || !response.body) {
+    const text = response.ok ? "no response body" : await response.text();
+    throw new LlmApiError(`OpenRouter stream failed (${response.status}): ${text}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let sseBuffer = "";
+  let content = "";
+  let usage: OpenRouterUsage | undefined;
+  let lastEmitLen = 0;
+
+  const emitPartial = () => {
+    if (!handlers.onPartial) return;
+    const parsed = parsePartialJson(content);
+    if (parsed && typeof parsed === "object") {
+      handlers.onPartial(normalizePartialRecipe(parsed));
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    sseBuffer += decoder.decode(value, { stream: true });
+
+    const lines = sseBuffer.split("\n");
+    sseBuffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const payload = trimmed.slice(5).trim();
+      if (payload === "" || payload === "[DONE]") continue;
+      try {
+        const chunk = JSON.parse(payload) as {
+          choices?: Array<{ delta?: { content?: string } }>;
+          usage?: OpenRouterUsage;
+        };
+        const delta = chunk.choices?.[0]?.delta?.content;
+        if (delta) content += delta;
+        if (chunk.usage) usage = chunk.usage;
+      } catch {
+        // Ignore partial/keep-alive SSE frames.
+      }
+    }
+
+    // Throttle progressive parses to roughly once per ~50 new characters.
+    if (content.length - lastEmitLen >= 50) {
+      lastEmitLen = content.length;
+      emitPartial();
+    }
+  }
+
+  const parsed = recipeSchema.parse(normalizeRecipeJson(parseModelJson(content)));
+  const latencyMs = Date.now() - start;
+  const cost = estimateRequestCost({
+    model: primary,
+    promptTokens: usage?.prompt_tokens,
+    completionTokens: usage?.completion_tokens,
+  });
+
+  logOptimizationAudit({
+    task: "recipe_generate",
+    model: primary,
+    latencyMs,
+    fallbackUsed: false,
+    ok: true,
+    promptTokens: usage?.prompt_tokens,
+    completionTokens: usage?.completion_tokens,
+    totalTokens: usage?.total_tokens,
+    estimatedCostUsd: cost.estimatedCostUsd,
+  });
+
+  return {
+    data: parsed,
+    meta: {
+      model: primary,
+      latencyMs,
+      fallbackUsed: false,
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+      estimatedCostUsd: cost.estimatedCostUsd,
+    },
+  };
 }
 
 export async function reviseRecipe(input: {

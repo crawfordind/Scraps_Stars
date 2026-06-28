@@ -127,9 +127,12 @@ export function ActiveCookingView({
           whileTap={{ scale: 0.96 }}
           transition={springSnappy}
         >
-          {isLast ? "Finish recipe ✓" : "Step done ✓"}
+          {isLast ? "Finish recipe ✓" : "Done · next step ✓"}
         </motion.button>
 
+        {/* Secondary: jump ahead WITHOUT marking the step done (no XP). Labeled
+            "Skip" so it reads distinctly from the primary complete-and-advance
+            action rather than as a second, competing "forward" button. */}
         <motion.button
           type="button"
           className="active-cook__nav-btn"
@@ -137,9 +140,9 @@ export function ActiveCookingView({
           disabled={isLast}
           whileTap={{ scale: 0.94 }}
           transition={springSnappy}
-          aria-label="Next step"
+          aria-label="Skip to next step without marking done"
         >
-          Next →
+          Skip →
         </motion.button>
       </footer>
 
