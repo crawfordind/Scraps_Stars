@@ -362,7 +362,9 @@ export function LiveCookExperience({
         <FadeIn className="panel verdict-complete">
           <h2>Told you. Feast.</h2>
           <p>
-            Your plated photo is on the share card. Spread the word — another feast from nothing.
+            {platedPhotoUrl
+              ? "Your plated photo is on the share card. Spread the word — another feast from nothing."
+              : "Spread the word — another feast from nothing."}
           </p>
           {platedPhotoUrl && (
             <div className="verdict-complete__photo">

@@ -122,7 +122,7 @@ export function ActiveCookingView({
         <motion.button
           type="button"
           className="active-cook__complete-btn"
-          onClick={isLast ? onCompleteStep : onCompleteStep}
+          onClick={onCompleteStep}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.96 }}
           transition={springSnappy}
