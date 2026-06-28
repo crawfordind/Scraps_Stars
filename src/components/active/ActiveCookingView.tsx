@@ -13,7 +13,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import { springGentle, springSnappy } from "@/lib/motion/spring";
+import { springSnappy } from "@/lib/motion/spring";
 import type { UtilityState } from "@/lib/state/cookingTypes";
 import { FloatingTimerDock } from "./FloatingTimerDock";
 
@@ -60,16 +60,20 @@ export function ActiveCookingView({
         </p>
       </header>
 
-      {/* Step stage — AnimatePresence cross-fades with spring physics */}
+      {/* Step stage — slide-only transition (NO opacity keyframe).
+          The step headline is the entire point of cook mode, so it must never be
+          hidden. A velocity-driven spring on opacity can stall near 0 under load
+          and leave the instruction invisible; animating only `x` keeps the text
+          at full opacity always, with a deterministic time-based tween. */}
       <main className="active-cook__stage">
         <AnimatePresence mode="wait">
           <motion.div
             key={step?.id ?? "empty"}
             className="active-cook__step"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={springGentle}
+            initial={{ x: 40 }}
+            animate={{ x: 0 }}
+            exit={{ x: -40 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
             <h1 className="active-cook__headline">{step?.headline}</h1>
             {step?.detail && <p className="active-cook__detail">{step.detail}</p>}
