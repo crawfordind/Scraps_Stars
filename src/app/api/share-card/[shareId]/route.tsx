@@ -139,6 +139,8 @@ function CardLayout({
               <div
                 key={stat.label}
                 style={{
+                  display: "flex",
+                  flexDirection: "column",
                   background: "rgba(214,90,46,0.1)",
                   border: `1px solid ${PALETTE.kraft}`,
                   borderRadius: 16,
@@ -147,8 +149,16 @@ function CardLayout({
                 }}
               >
                 <div style={{ fontSize: linkFormat ? 14 : 16, color: PALETTE.muted }}>{stat.label}</div>
-                <div style={{ fontSize: linkFormat ? 24 : 30, fontWeight: 700 }}>
-                  {stat.value}{" "}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: 4,
+                    fontSize: linkFormat ? 24 : 30,
+                    fontWeight: 700,
+                  }}
+                >
+                  <span>{stat.value}</span>
                   <span style={{ fontSize: linkFormat ? 12 : 14, color: PALETTE.muted }}>est.</span>
                 </div>
               </div>
@@ -156,8 +166,7 @@ function CardLayout({
           </div>
 
           <div style={{ fontSize: linkFormat ? 20 : 24, color: PALETTE.ember, fontWeight: 600 }}>
-            +{data.xpEarned} XP earned
-            {data.nailedIt ? " · Nailed It ✓" : ""}
+            {`+${data.xpEarned} XP earned${data.nailedIt ? " · Nailed It ✓" : ""}`}
           </div>
         </div>
       </div>

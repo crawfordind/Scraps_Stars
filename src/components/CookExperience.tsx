@@ -29,11 +29,15 @@ export function CookExperience() {
     initialGamification: DEMO_HUB_SNAPSHOT.gamification,
   });
 
-  // Lightweight tick for timer display refresh (dock reads wall-clock)
+  // Tick the timer display only while a timer is running. An unconditional
+  // interval re-renders this motion-heavy tree twice a second forever and is the
+  // main cause of cook-mode jank; gate it on active timers so idle costs nothing.
+  const hasRunningTimer = session.utility.timers.some((t) => t.status === "running");
   useEffect(() => {
+    if (!hasRunningTimer) return;
     const id = window.setInterval(() => setTimerTick((t) => t + 1), 500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [hasRunningTimer]);
 
   const enterActive = useCallback(() => setMode("active"), []);
   const exitActive = useCallback(() => setMode("hub"), []);

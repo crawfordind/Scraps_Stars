@@ -100,10 +100,16 @@ export function LiveCookExperience({
     },
   });
 
+  // Only tick the timer display while a timer is actually running. The previous
+  // unconditional 500ms interval re-rendered the entire (motion-heavy) cooking
+  // tree twice a second forever — even with no active timer — which is the main
+  // source of cook-mode jank / unresponsiveness. Idle stepping now costs nothing.
+  const hasRunningTimer = session.utility.timers.some((t) => t.status === "running");
   useEffect(() => {
+    if (!hasRunningTimer) return;
     const id = window.setInterval(() => setTimerTick((t) => t + 1), 500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [hasRunningTimer]);
 
   useEffect(() => {
     let cancelled = false;
@@ -356,7 +362,9 @@ export function LiveCookExperience({
         <FadeIn className="panel verdict-complete">
           <h2>Told you. Feast.</h2>
           <p>
-            Your plated photo is on the share card. Spread the word — another feast from nothing.
+            {platedPhotoUrl
+              ? "Your plated photo is on the share card. Spread the word — another feast from nothing."
+              : "Spread the word — another feast from nothing."}
           </p>
           {platedPhotoUrl && (
             <div className="verdict-complete__photo">

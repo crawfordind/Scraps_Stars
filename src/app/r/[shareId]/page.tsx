@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { getSavedRecipeByShareId } from "@/lib/db/recipes";
 import { getChefById } from "@/lib/chefs/personas";
@@ -17,7 +18,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Recipe not found · Barefeast" };
   }
 
-  const origin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  // Prefer the canonical URL when configured; otherwise derive the absolute
+  // origin from the request so social previews resolve correctly in any
+  // environment (preview deploys, non-default dev ports, etc.) instead of a
+  // hardcoded localhost:3000 that breaks the og:image.
+  let origin = process.env.NEXT_PUBLIC_APP_URL;
+  if (!origin) {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    origin = host ? `${proto}://${host}` : "http://localhost:3000";
+  }
   const cardUrl = `${origin}/api/share-card/${shareId}?format=link`;
 
   return {

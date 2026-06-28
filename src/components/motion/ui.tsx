@@ -3,7 +3,7 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { springGentle, springSnappy } from "@/lib/motion/spring";
+import { springSnappy } from "@/lib/motion/spring";
 
 type FadeInProps = {
   children: ReactNode;
@@ -20,7 +20,9 @@ export function FadeIn({ children, className, delay = 0 }: FadeInProps) {
       className={className}
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ ...springGentle, delay }}
+      // Tween, not spring — a velocity-driven spring can freeze near opacity:0
+      // under mount-time load and leave content invisible.
+      transition={{ duration: 0.28, ease: "easeOut", delay }}
     >
       {children}
     </motion.div>
@@ -36,13 +38,23 @@ export function TabContent({ tabKey, children }: TabContentProps) {
   const reduce = useReducedMotion();
   if (reduce) return <div key={tabKey}>{children}</div>;
 
+  // Slide-only entrance — deliberately NO opacity keyframe.
+  //
+  // AppShell renders three separately-conditional <TabContent> children inside a
+  // single <AnimatePresence mode="wait">. That's an AnimatePresence anti-pattern
+  // (it expects keyed children), and under mount-time load the enter animation
+  // can fail to fire — leaving the wrapper frozen at its `initial` values. If
+  // `initial` hid the content (opacity:0), the whole tab rendered blank.
+  //
+  // By animating only `x`, the content is always opacity:1 and therefore always
+  // visible; a stalled slide just leaves it ~20px off, which is imperceptible.
   return (
     <motion.div
       key={tabKey}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -16 }}
-      transition={springGentle}
+      initial={{ x: 20 }}
+      animate={{ x: 0 }}
+      exit={{ x: -16 }}
+      transition={{ duration: 0.28, ease: "easeOut" }}
     >
       {children}
     </motion.div>
@@ -67,7 +79,8 @@ export function PhaseContent({ phaseKey, children, className }: PhaseContentProp
         initial={{ opacity: 0, x: 32 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -32 }}
-        transition={springGentle}
+        // Tween (not spring) so the entrance can't stall at opacity:0 under load.
+        transition={{ duration: 0.28, ease: "easeOut" }}
       >
         {children}
       </motion.div>
