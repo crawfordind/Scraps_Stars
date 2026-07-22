@@ -51,3 +51,13 @@ npm run db:studio     # open Drizzle Studio
 ## Cost tracking
 
 Every OpenRouter call logs `[optimization_audit]` with latency, token counts, and `estimatedCostUsd`. The UI shows per-step and full-cycle cost against the $0.005 target.
+
+## Contributing
+
+Contributions, bug reports, and ideas are welcome — please open an issue or a
+pull request. If you're planning a larger change, open an issue first so we can
+discuss the approach.
+
+## License
+
+Released under the [MIT License](LICENSE). © 2026 Daniel Crawford.
