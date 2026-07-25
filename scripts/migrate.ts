@@ -24,6 +24,7 @@ const dbUrl = process.env.DATABASE_URL ?? "file:local.db";
 
 const client = createClient({
   url: dbUrl,
+  authToken: process.env.DATABASE_AUTH_TOKEN,
 });
 
 const db = drizzle(client);
