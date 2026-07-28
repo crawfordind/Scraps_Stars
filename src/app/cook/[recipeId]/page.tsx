@@ -19,7 +19,7 @@ export default async function CookRecipePage({ params, searchParams }: PageProps
     return (
       <main id="main-content" className="public-page">
         <p>Recipe not found.</p>
-        <Link href="/">Back to barefeast</Link>
+        <Link href="/cook">Back to barefeast</Link>
       </main>
     );
   }

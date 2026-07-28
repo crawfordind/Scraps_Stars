@@ -318,7 +318,7 @@ export function LiveCookExperience({
 
   return (
     <div className="cook-experience">
-      <MotionLink href="/" className="cook-experience__back">
+      <MotionLink href="/cook" className="cook-experience__back">
         ← Home
       </MotionLink>
 
