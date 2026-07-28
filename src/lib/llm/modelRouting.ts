@@ -22,25 +22,32 @@ export const PRODUCTION_ROUTING: Record<TaskKind, ModelRoute> = {
   },
 };
 
-/** Free tier for zero-cost local experiments. */
+/** Free tier — every task routes exclusively to openrouter/free (primary + fallback). */
 export const FREE_ROUTING: Record<TaskKind, ModelRoute> = {
   inventory_extract: {
     primary: "openrouter/free",
-    fallback: "google/gemini-2.0-flash-exp:free",
+    fallback: "openrouter/free",
   },
   recipe_generate: {
     primary: "openrouter/free",
-    fallback: "meta-llama/llama-3.2-3b-instruct:free",
+    fallback: "openrouter/free",
   },
   recipe_revise: {
     primary: "openrouter/free",
-    fallback: "meta-llama/llama-3.2-3b-instruct:free",
+    fallback: "openrouter/free",
   },
   coach_briefing: {
     primary: "openrouter/free",
-    fallback: "google/gemini-2.0-flash-exp:free",
+    fallback: "openrouter/free",
   },
 };
+
+/**
+ * Hard lock: force every OpenRouter call to openrouter/free, ignoring the
+ * OPENROUTER_USE_FREE_MODELS env var. Flip to false to restore env-based routing
+ * (and the paid PRODUCTION_ROUTING models above).
+ */
+export const FORCE_FREE_MODELS = true;
 
 export const TASK_MAX_TOKENS: Record<TaskKind, number> = {
   // Capped at 25 items; the structured payload fits comfortably under 1024 and
@@ -56,5 +63,6 @@ export function useFreeModels(): boolean {
 }
 
 export function getModelRouting(task: TaskKind): ModelRoute {
+  if (FORCE_FREE_MODELS) return FREE_ROUTING[task];
   return useFreeModels() ? FREE_ROUTING[task] : PRODUCTION_ROUTING[task];
 }
