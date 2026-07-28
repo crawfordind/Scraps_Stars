@@ -1,21 +1,18 @@
-import { CookExperience } from "@/components/CookExperience";
+import { Suspense } from "react";
+import { AppShell } from "@/components/AppShell";
 
-/**
- * /cook — showcase route for the three UI pillars.
- * Hub → Active cooking → Reward bursts in one integrated flow.
- */
 export default function CookPage() {
   return (
-    <main id="main-content" className="cook-page">
-      <header className="hero hero--barefeast cook-page__hero">
-        <p className="stamp-label hero__alt">cook mode</p>
+    <main id="main-content">
+      <header className="hero hero--barefeast">
         <h1 className="hero__wordmark">barefeast</h1>
         <div className="hero__rule" aria-hidden="true" />
-        <p className="hero__tagline">
-          Hands on the counter, feast on the table — built for the kitchen, not the couch.
-        </p>
+        <p className="hero__tagline">A feast from almost nothing.</p>
+        <p className="hero__alt stamp-label">Bare fridge. Full table.</p>
       </header>
-      <CookExperience />
+      <Suspense fallback={null}>
+        <AppShell />
+      </Suspense>
     </main>
   );
 }
