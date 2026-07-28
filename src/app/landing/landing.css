@@ -1,0 +1,1168 @@
+/* ============================================================================
+   Barefeast landing page — scoped under .landing
+   Built on the app's existing brand tokens (globals.css :root) and fonts
+   (--font-display Fraunces / --font-ui Source Sans 3 / --font-stamp IBM Plex Mono).
+   Design brief: warm editorial "kraft-paper zine" — color (ember) is the reward,
+   arriving only at payoff moments. No photos; everything in CSS/SVG/emoji.
+   ============================================================================ */
+
+.landing {
+  --lp-max: 1120px;
+  --lp-pad: clamp(1.1rem, 5vw, 2.5rem);
+  --lp-band-y: clamp(4rem, 9vw, 7rem);
+  --lp-hair: 1px solid var(--kraft);
+  --lp-grain:
+    repeating-linear-gradient(90deg, rgba(42, 38, 34, 0.028) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(42, 38, 34, 0.02) 0 1px, transparent 1px 4px);
+  color: var(--ink);
+  font-family: var(--font-ui), "Source Sans 3", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.landing *,
+.landing *::before,
+.landing *::after {
+  box-sizing: border-box;
+}
+
+.landing h1,
+.landing h2,
+.landing h3,
+.landing p,
+.landing ul,
+.landing figure {
+  margin: 0;
+}
+
+.landing ul {
+  padding: 0;
+  list-style: none;
+}
+
+.landing a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing :focus-visible {
+  outline: 3px solid var(--ember-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.landing__wrap {
+  width: 100%;
+  max-width: var(--lp-max);
+  margin-inline: auto;
+  padding-inline: var(--lp-pad);
+}
+
+/* ---- Shared editorial atoms ------------------------------------------------ */
+
+.lp-eyebrow {
+  display: inline-block;
+  font-family: var(--font-stamp), "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ember-deep);
+}
+
+.lp-eyebrow--herb {
+  color: var(--herb);
+}
+
+.lp-eyebrow--cream {
+  color: var(--gold-light);
+}
+
+.lp-h2 {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin-top: 0.7rem;
+  max-width: 20ch;
+}
+
+.lp-lede {
+  margin-top: 1rem;
+  max-width: 60ch;
+  color: var(--ink);
+  font-size: clamp(1.02rem, 1.6vw, 1.16rem);
+}
+
+.lp-section {
+  padding-block: var(--lp-band-y);
+  border-top: var(--lp-hair);
+}
+
+.lp-band-oat {
+  background: var(--oat);
+}
+
+.lp-band-cream {
+  background: var(--cream);
+}
+
+/* ---- Buttons --------------------------------------------------------------- */
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5ch;
+  min-height: 3.25rem;
+  padding-inline: 1.5rem;
+  border-radius: 999px;
+  font-family: var(--font-ui), "Source Sans 3", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.02rem;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.lp-btn--primary {
+  background: linear-gradient(180deg, var(--ember) 0%, var(--ember-deep) 100%);
+  color: var(--cream);
+  box-shadow: 0 2px 0 var(--ember-deep), 0 8px 18px rgba(214, 90, 46, 0.24);
+}
+
+.lp-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 0 var(--ember-deep), 0 12px 24px rgba(214, 90, 46, 0.3);
+}
+
+.lp-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.lp-btn--ghost:hover {
+  transform: translateY(-2px);
+  background: rgba(42, 38, 34, 0.04);
+}
+
+.lp-btn--onember {
+  background: var(--cream);
+  color: var(--ember-deep);
+  box-shadow: 0 2px 0 rgba(42, 38, 34, 0.25), 0 10px 24px rgba(42, 38, 34, 0.2);
+}
+
+.lp-btn--onember:hover {
+  transform: translateY(-2px);
+}
+
+.lp-btn:active {
+  transform: scale(0.975);
+}
+
+.lp-textcta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4ch;
+  font-weight: 600;
+  color: var(--ember-deep);
+  border-bottom: 2px solid var(--accent-25);
+  padding-bottom: 2px;
+  transition: border-color 0.18s ease;
+}
+
+.lp-textcta:hover {
+  border-color: var(--ember-deep);
+}
+
+.lp-trust {
+  font-family: var(--font-stamp), "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* ---- Sticky header --------------------------------------------------------- */
+
+.lp-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(244, 239, 230, 0.86);
+  backdrop-filter: saturate(1.1) blur(6px);
+  border-bottom: var(--lp-hair);
+}
+
+.lp-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.75rem;
+}
+
+.lp-wordmark {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.lp-wordmark .feast {
+  background: linear-gradient(180deg, var(--ember) 0%, var(--ember-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ember);
+}
+
+.lp-header .lp-wordmark {
+  font-size: 1.5rem;
+}
+
+.lp-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 2rem);
+}
+
+.lp-nav__links {
+  display: flex;
+  gap: clamp(1rem, 2.4vw, 1.9rem);
+}
+
+.lp-nav__links a {
+  font-size: 0.95rem;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.lp-nav__links a:hover {
+  color: var(--ink);
+}
+
+.lp-header .lp-btn {
+  min-height: 2.6rem;
+  padding-inline: 1.1rem;
+  font-size: 0.95rem;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+
+.lp-hero {
+  position: relative;
+  background: var(--oat);
+  background-image:
+    radial-gradient(60% 55% at 72% 30%, rgba(232, 163, 61, 0.14) 0%, transparent 60%),
+    var(--lp-grain);
+  padding-block: clamp(3.5rem, 8vw, 6rem) clamp(3.5rem, 8vw, 6rem);
+  overflow: hidden;
+}
+
+.lp-hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.lp-hero__mark {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-size: clamp(3.4rem, 12vw, 7.5rem);
+  margin-top: 1rem;
+}
+
+.lp-hero__tagline {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink);
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  margin-top: 0.5rem;
+}
+
+.lp-hero__h1 {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  line-height: 1.06;
+  margin-top: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+.lp-hero__sub {
+  margin-top: 1rem;
+  max-width: 54ch;
+  font-size: clamp(1.02rem, 1.7vw, 1.18rem);
+  color: var(--ink);
+}
+
+.lp-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.8rem;
+}
+
+.lp-hero__trust {
+  margin-top: 1.15rem;
+}
+
+.lp-hero__badge {
+  margin-bottom: 0.4rem;
+}
+
+/* Hero CSS "scan → feast" panel (no photo) */
+.lp-scan {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  max-width: 380px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.lp-card {
+  background: var(--cream);
+  border: 1px solid var(--kraft);
+  border-radius: 9px;
+  box-shadow: 0 1px 0 var(--kraft), 0 8px 20px rgba(42, 38, 34, 0.07);
+}
+
+.lp-scan__shot {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.lp-scan__cap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.64rem;
+  color: var(--muted);
+  border-bottom: 1px dashed var(--border-faint);
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.lp-scan__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35ch;
+  padding: 0.28rem 0.6rem;
+  background: var(--oat);
+  border: 1px solid var(--border-faint);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.lp-scan__arrow {
+  justify-self: center;
+  font-family: var(--font-stamp), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--ember-deep);
+  text-transform: uppercase;
+}
+
+.lp-scan__feast {
+  border-left: 4px solid var(--ember-deep);
+  background: linear-gradient(180deg, #fffaf3 0%, var(--cream) 100%);
+  padding: 1rem 1.15rem 1.15rem;
+}
+
+.lp-scan__tier {
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.62rem;
+  color: var(--herb);
+  font-weight: 500;
+}
+
+.lp-scan__dish {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.32rem;
+  line-height: 1.15;
+  margin-top: 0.35rem;
+}
+
+.lp-scan__meta {
+  margin-top: 0.55rem;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.lp-scan__voice {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border-faint);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+/* ---- Value props ----------------------------------------------------------- */
+
+.lp-props {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2.2rem;
+}
+
+.lp-prop {
+  padding: 1.4rem 1.4rem 1.5rem;
+}
+
+.lp-prop__ic,
+.lp-feat__ic {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: var(--oat);
+  border: 1px solid var(--kraft);
+  font-size: 1.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.lp-prop__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.18rem;
+}
+
+.lp-prop__b {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.97rem;
+}
+
+/* ---- Stakes ---------------------------------------------------------------- */
+
+.lp-stakes__inner {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+}
+
+.lp-stakes__quote {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3.6vw, 2.6rem);
+  line-height: 1.14;
+  max-width: 22ch;
+  margin-top: 0.8rem;
+}
+
+.lp-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1.5rem, 6vw, 4rem);
+  margin-top: 2.4rem;
+}
+
+.lp-stat__v {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  color: var(--turmeric);
+  line-height: 1;
+}
+
+.lp-stat--zero .lp-stat__v {
+  color: var(--ember);
+}
+
+.lp-stat__l {
+  margin-top: 0.5rem;
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: var(--muted);
+  max-width: 18ch;
+}
+
+/* ---- How it works ---------------------------------------------------------- */
+
+.lp-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+  margin-top: 2.4rem;
+}
+
+.lp-step {
+  position: relative;
+  padding: 1.5rem 1.5rem 1.6rem;
+}
+
+.lp-step__n {
+  font-family: var(--font-stamp), monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: var(--ember-deep);
+  font-weight: 500;
+}
+
+.lp-step__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-top: 0.5rem;
+}
+
+.lp-step__b {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.lp-how__foot {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+/* ---- Feature sections ------------------------------------------------------ */
+
+.lp-feats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+  margin-top: 2.4rem;
+}
+
+.lp-feat {
+  padding: 1.6rem 1.6rem 1.7rem;
+}
+
+.lp-feat__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.32rem;
+  line-height: 1.18;
+  margin-top: 0.5rem;
+}
+
+.lp-feat__b {
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.lp-feat__list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.lp-feat__list li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.lp-feat__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--herb);
+}
+
+/* ---- Tiers ----------------------------------------------------------------- */
+
+.lp-tiers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2.4rem;
+}
+
+.lp-tier {
+  padding: 1.5rem 1.5rem 1.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--kraft);
+  background: var(--cream);
+  box-shadow: 0 1px 0 var(--kraft), 0 8px 20px rgba(42, 38, 34, 0.06);
+}
+
+.lp-tier--1 {
+  background: linear-gradient(180deg, rgba(110, 139, 91, 0.09), var(--cream) 60%);
+  border-left: 3px solid var(--ember-deep);
+}
+
+.lp-tier--2 {
+  background: linear-gradient(180deg, rgba(232, 163, 61, 0.1), var(--cream) 60%);
+}
+
+.lp-tier--3 {
+  background: linear-gradient(180deg, rgba(214, 90, 46, 0.09), var(--cream) 60%);
+}
+
+.lp-tier__label {
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.lp-tier__stamp {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ember);
+  color: var(--cream);
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+
+.lp-tier__mark {
+  font-size: 1.8rem;
+  margin-top: 0.9rem;
+}
+
+.lp-tier__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.24rem;
+  margin-top: 0.5rem;
+}
+
+.lp-tier__b {
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.lp-ctaband {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+  text-align: center;
+  padding: 1.4rem;
+  border: 1px dashed var(--kraft);
+  border-radius: 10px;
+  background: var(--oat);
+}
+
+.lp-ctaband__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* ---- Chefs ----------------------------------------------------------------- */
+
+.lp-chefs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(230px, 1fr);
+  gap: 1rem;
+  margin-top: 2.4rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.6rem;
+  scrollbar-width: thin;
+}
+
+.lp-chef {
+  scroll-snap-align: start;
+  padding: 1.4rem;
+}
+
+.lp-chef__av {
+  font-size: 2rem;
+}
+
+.lp-chef__n {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin-top: 0.6rem;
+}
+
+.lp-chef__style {
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.lp-chef__q {
+  margin-top: 0.7rem;
+  font-style: italic;
+  color: var(--ink);
+  font-size: 0.94rem;
+}
+
+.lp-chef__tip {
+  margin-top: 0.9rem;
+  display: inline-block;
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6rem;
+  color: var(--herb);
+  border: 1px solid var(--herb);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.lp-chefs__note {
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ---- Impact (the one dark band) ------------------------------------------- */
+
+.lp-impact {
+  background: var(--ink);
+  color: var(--cream);
+  border-top: 1px solid #000;
+}
+
+.lp-impact .lp-h2 {
+  color: var(--cream);
+}
+
+.lp-impact .lp-lede {
+  color: rgba(250, 247, 242, 0.8);
+}
+
+.lp-impact__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 2.2rem;
+}
+
+.lp-metric {
+  border: 1px solid rgba(212, 201, 184, 0.22);
+  border-radius: 9px;
+  padding: 1.2rem;
+  background: rgba(250, 247, 242, 0.03);
+}
+
+.lp-metric__v {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--herb-green);
+}
+
+.lp-metric--warm .lp-metric__v {
+  color: var(--gold-light);
+}
+
+.lp-metric__l {
+  margin-top: 0.35rem;
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  color: rgba(250, 247, 242, 0.66);
+}
+
+.lp-wincard {
+  margin-top: 1.6rem;
+  border-left: 4px solid var(--ember);
+  background: rgba(250, 247, 242, 0.05);
+  border-radius: 8px;
+  padding: 1.2rem 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.lp-wincard__badge {
+  font-size: 2rem;
+}
+
+.lp-wincard__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.lp-wincard__s {
+  font-size: 0.9rem;
+  color: rgba(250, 247, 242, 0.7);
+  margin-top: 0.2rem;
+}
+
+.lp-wincard__xp {
+  margin-left: auto;
+  font-family: var(--font-stamp), monospace;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+  color: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+}
+
+/* ---- Compare --------------------------------------------------------------- */
+
+.lp-compare__wrap {
+  margin-top: 2.2rem;
+  overflow-x: auto;
+  border: 1px solid var(--kraft);
+  border-radius: 10px;
+  background: var(--cream);
+  box-shadow: 0 1px 0 var(--kraft), 0 8px 20px rgba(42, 38, 34, 0.06);
+}
+
+.lp-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+.lp-table th,
+.lp-table td {
+  text-align: left;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 1px solid var(--border-faint);
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.lp-table thead th {
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  color: var(--muted);
+  border-bottom: 1px solid var(--kraft);
+}
+
+.lp-table__feat {
+  font-weight: 600;
+  color: var(--ink);
+  width: 44%;
+}
+
+.lp-col-bf {
+  background: linear-gradient(180deg, rgba(214, 90, 46, 0.07), rgba(214, 90, 46, 0.03));
+  border-left: 1px solid var(--accent-25);
+  border-right: 1px solid var(--accent-25);
+}
+
+.lp-table thead .lp-col-bf {
+  color: var(--ember-deep);
+}
+
+.lp-yes,
+.lp-no {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.lp-yes {
+  color: var(--ember-deep);
+}
+
+.lp-no {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.lp-yes__g {
+  font-weight: 700;
+}
+
+.lp-compare__cta {
+  margin-top: 1.8rem;
+  text-align: center;
+}
+
+/* ---- FAQ ------------------------------------------------------------------- */
+
+.lp-faq {
+  margin-top: 2.2rem;
+  max-width: 760px;
+}
+
+.lp-faq details {
+  border-top: 1px solid var(--kraft);
+  padding: 0.3rem 0;
+}
+
+.lp-faq details:last-child {
+  border-bottom: 1px solid var(--kraft);
+}
+
+.lp-faq summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.05rem 0.2rem;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.lp-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.lp-faq summary::after {
+  content: "+";
+  font-family: var(--font-ui), sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--ember-deep);
+  transition: transform 0.2s ease;
+}
+
+.lp-faq details[open] summary::after {
+  content: "\2013";
+}
+
+.lp-faq__a {
+  padding: 0 0.2rem 1.1rem;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+/* ---- Final CTA (the one ember band) --------------------------------------- */
+
+.lp-final {
+  background: linear-gradient(160deg, var(--ember) 0%, var(--ember-deep) 100%);
+  color: var(--cream);
+  text-align: center;
+  border-top: 1px solid var(--ember-deep);
+}
+
+.lp-final__t {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.08;
+  max-width: 18ch;
+  margin-inline: auto;
+}
+
+.lp-final__s {
+  margin: 1.1rem auto 0;
+  max-width: 46ch;
+  color: rgba(250, 247, 242, 0.9);
+  font-size: 1.08rem;
+}
+
+.lp-final__actions {
+  margin-top: 2rem;
+}
+
+.lp-final__trust {
+  margin-top: 1.2rem;
+  color: rgba(250, 247, 242, 0.82);
+}
+
+/* ---- Footer ---------------------------------------------------------------- */
+
+.lp-footer {
+  background: var(--oat);
+  padding-block: clamp(2.6rem, 6vw, 4rem);
+  border-top: 3px double var(--kraft);
+}
+
+.lp-footer__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.8rem;
+}
+
+.lp-footer__mark .lp-wordmark {
+  font-size: 1.7rem;
+}
+
+.lp-footer__tag {
+  margin-top: 0.5rem;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.lp-footer__col h4 {
+  font-family: var(--font-stamp), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+}
+
+.lp-footer__col ul {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.lp-footer__col a {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lp-footer__col a:hover {
+  color: var(--ember-deep);
+}
+
+.lp-footer__legal {
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--kraft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---- Mobile sticky CTA ----------------------------------------------------- */
+
+.lp-mobilecta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: none;
+  padding: 0.7rem var(--lp-pad) calc(0.7rem + var(--safe-bottom, 0px));
+  background: rgba(244, 239, 230, 0.94);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--kraft);
+}
+
+.lp-mobilecta .lp-btn {
+  width: 100%;
+}
+
+.lp-mobilecta.is-visible {
+  display: block;
+}
+
+/* ---- Reveal-on-scroll (progressive; visible if JS/observer absent) --------- */
+
+.landing.js-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.landing.js-ready [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* ---- Responsive ------------------------------------------------------------ */
+
+@media (min-width: 560px) {
+  .lp-props {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lp-tiers {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .lp-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .lp-feats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lp-impact__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .lp-footer__grid {
+    grid-template-columns: 1.6fr 1fr 1fr;
+  }
+}
+
+@media (min-width: 940px) {
+  .lp-hero__grid {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
+  .lp-chefs {
+    overflow: visible;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 939px) {
+  .lp-nav__links {
+    display: none;
+  }
+}
+
+@media (max-width: 719px) {
+  .lp-mobilecta.is-visible {
+    display: block;
+  }
+}
+
+@media (min-width: 720px) {
+  .lp-mobilecta {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing.js-ready [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .landing * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
